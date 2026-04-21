@@ -1,6 +1,7 @@
 ###########################################################################################################################################################################################################
 ########################## 1. Overblik over hele DOM (struktur) ###########################################################################################################################################
 ###########################################################################################################################################################################################################
+
 Denne sektion omhandler metoder til at opnå et overblik over DOM-strukturen i en webapplikation med fokus på både visuel inspektion og programmatisk analyse. Formålet er at forstå, hvordan dokumentet er
 opbygget, hvordan elementer er organiseret hierarkisk, samt hvordan denne struktur påvirker rendering og performance. Ved at anvende en kombination af direkte DOM-udtræk, visning i DevTools og eksport
 til eksterne værktøjer opnås en fleksibel tilgang, hvor både hurtig fejlfinding og dybere analyse er mulig. Metoderne spænder fra simple snapshots af hele HTML-strukturen til mere avancerede
@@ -139,8 +140,10 @@ getDepth(document.body);
 >
 >
 
+
+
 ###########################################################################################################################################################################################################
-2. Tjek om vigtige elementer findes
+############ 2. Tjek om vigtige elementer findes ##########################################################################################################################################################
 ###########################################################################################################################################################################################################
 
 ---- 2.1 Find centrale UI elementer -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -158,30 +161,30 @@ console.log({
 });
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-2.2. Verificer specifikke elementer (tilpas selectors)
+---- 2.2. Verificer specifikke elementer (tilpas selectors) -----------------------------------------------------------------------------------------------------------------------------------------------
 Returnerer en liste af specifikke DOM-elementer baseret på angivne selectors, hvor hvert element enten repræsenteres som en reference til det fundne DOM-node eller som `null`, hvis elementet ikke
 eksisterer. Metoden anvendes til målrettet verifikation af kritiske UI-komponenter, såsom login-sektion, kurv og checkout, og giver en hurtig måde at afgøre, om centrale funktionelle områder er korrekt
 indlæst i DOM’en. Denne tilgang er særligt anvendelig i QA-sammenhæng til at validere, at forventede elementer er til stede efter bestemte handlinger eller ved initial rendering. Den kan også bruges til
 at identificere fejl i selectors, manglende komponenter eller problemer med dynamisk rendering, hvor elementer ikke bliver oprettet som forventet. Det skal bemærkes, at metoden udelukkende verificerer
 tilstedeværelsen i DOM’en og ikke tager højde for elementernes synlighed, interaktivitet eller tilstand. Yderligere analyse er derfor nødvendig for at vurdere, om elementerne fungerer korrekt i
-brugerinterfacet.
+brugerinterfacet. (Returnerer null hvis element mangler)
 
-------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 [
   document.querySelector('#login'),
   document.querySelector('.cart'),
   document.querySelector('.checkout')
 ]
-------------------------------------------------------------------------------------------
-Returnerer null hvis element mangler
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 >
 >
 >
 
-##########################################################################
+###########################################################################################################################################################################################################
 3. Synlighed af elementer (meget vigtigt)
-##########################################################################
+###########################################################################################################################################################################################################
+
 
 3.1 Tjek om element er synligt
 ------------------------------------------------------------------------------------------
