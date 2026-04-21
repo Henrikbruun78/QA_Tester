@@ -1,0 +1,12 @@
+#### Test af robusthed ####
+
+fetch('/api/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    email: 123,
+    password: true
+  })
+})
+.then(res => res.json())
+.then(console.log)
