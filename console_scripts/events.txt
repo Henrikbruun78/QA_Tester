@@ -1,0 +1,7 @@
+#### Find alle event listeners ####
+getEventListeners(document)
+
+#### Specifikt til quesry ####
+getEventListeners(document.querySelector('button'))
+
+
