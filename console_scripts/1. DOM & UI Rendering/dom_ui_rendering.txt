@@ -52,6 +52,7 @@ at metoden er afhængig af DevTools’ grafiske interface og derfor ikke egner s
 inspect(document.documentElement)
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+
 ---- 1.5. Download DOM som fil ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 DOM-strukturen kan eksporteres direkte fra browseren som en HTML-fil ved hjælp af script-baserede metoder. Dette muliggør offline analyse, dokumentation og sammenligning af forskellige systemtilstande.
 Metoden anvendes særligt i QA-sammenhæng til snapshot- og regressionstest, hvor ændringer i DOM’en kan identificeres og analyseres systematisk.
@@ -88,6 +89,7 @@ function getDOMTree(el) {
 console.log(getDOMTree(document.body));
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+
 ---- 1.7 Antal DOM nodes (performance indikator) ----------------------------------------------------------------------------------------------------------------------------------------------------------
 Returnerer det samlede antal DOM-elementer på siden ved at selektere alle noder (`*`). Dette anvendes som en hurtig indikator for DOM-kompleksitet og kan give en tidlig vurdering af potentielle
 performanceproblemer relateret til rendering, reflow og memory-forbrug. Metoden er velegnet til at sammenligne DOM-størrelsen før og efter dynamiske ændringer, såsom tilføjelse af komponenter eller
@@ -107,6 +109,7 @@ Antal nodes	Vurdering
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 document.querySelectorAll('*').length
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 ---- 1.8 DOM dybde ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 DOM-dybde refererer til antallet af niveauer i dokumentets hierarkiske struktur, målt fra roden af DOM-træet (`<html>` eller et valgt udgangspunkt som `document.body`) ned til de dybest placerede
