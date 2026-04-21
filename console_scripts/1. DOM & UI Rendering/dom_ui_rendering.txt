@@ -1,0 +1,177 @@
+##########################################################################
+1. Overblik over hele DOM (struktur)
+##########################################################################
+
+1.1 Dump hele HTML
+-----------------------------------------------------------------------------------------
+document.documentElement.outerHTML
+------------------------------------------------------------------------------------------
+Bruges til:
+Sammenligne før/efter ændringer
+Debug rendering issues
+
+
+1.2 Antal DOM nodes (performance indikator)
+------------------------------------------------------------------------------------------
+document.querySelectorAll('*').length
+------------------------------------------------------------------------------------------
+QA insight:
+Meget høj værdi = potentiel performance issue
+
+>
+>
+>
+
+##########################################################################
+2. Tjek om vigtige elementer findes
+##########################################################################
+
+2.1 Find centrale UI elementer
+------------------------------------------------------------------------------------------
+{
+  loginForm: document.querySelector('form'),
+  buttons: document.querySelectorAll('button').length,
+  inputs: document.querySelectorAll('input').length,
+  images: document.querySelectorAll('img').length
+}
+------------------------------------------------------------------------------------------
+
+2.2. Verificer specifikke elementer (tilpas selectors)
+------------------------------------------------------------------------------------------
+[
+  document.querySelector('#login'),
+  document.querySelector('.cart'),
+  document.querySelector('.checkout')
+]
+------------------------------------------------------------------------------------------
+Returnerer null hvis element mangler
+
+>
+>
+>
+
+##########################################################################
+3. Synlighed af elementer (meget vigtigt)
+##########################################################################
+
+3.1 Tjek om element er synligt
+------------------------------------------------------------------------------------------
+function isVisible(el) {
+  if (!el) return false;
+  const style = window.getComputedStyle(el);
+  return style.display !== 'none' &&
+         style.visibility !== 'hidden' &&
+         el.offsetHeight > 0;
+}
+
+isVisible(document.querySelector('button'))
+------------------------------------------------------------------------------------------
+
+3.2 Tjek ALLE knapper for synlighed
+------------------------------------------------------------------------------------------
+[...document.querySelectorAll('button')].map(btn => ({
+  text: btn.innerText,
+  visible: btn.offsetParent !== null
+}))
+------------------------------------------------------------------------------------------
+
+>
+>
+>
+ 
+##########################################################################  
+4. Tjek UI tekst (content validation)
+##########################################################################
+
+4.1. Hent al synlig tekst
+------------------------------------------------------------------------------------------
+document.body.innerText
+------------------------------------------------------------------------------------------
+
+4.2 Find bestemte tekster
+------------------------------------------------------------------------------------------
+document.body.innerText.includes("Log ind")
+------------------------------------------------------------------------------------------
+
+##########################################################################
+5. Billeder og assets
+##########################################################################
+5.1 Tjek alle billeder
+------------------------------------------------------------------------------------------
+[...document.images].map(img => ({
+  src: img.src,
+  loaded: img.complete
+}))
+------------------------------------------------------------------------------------------
+
+5.2 Find broken images
+------------------------------------------------------------------------------------------
+[...document.images].filter(img => !img.complete)
+------------------------------------------------------------------------------------------
+
+6. Dynamiske ændringer (live overvågning)
+
+6.1 Observer DOM ændringer
+
+------------------------------------------------------------------------------------------
+const observer = new MutationObserver(mutations => {
+  console.log(mutations);
+});
+
+observer.observe(document.body, {
+  childList: true,
+  subtree: true
+});
+------------------------------------------------------------------------------------------
+Bruges til:
+login ændringer
+kurv opdatering
+dynamisk rendering
+
+7. CSS & layout issues
+7.1 Find elementer uden størrelse
+------------------------------------------------------------------------------------------
+[...document.querySelectorAll('*')].filter(el => el.offsetHeight === 0)
+------------------------------------------------------------------------------------------
+
+7.2 Tjek overflow problemer
+------------------------------------------------------------------------------------------
+[...document.querySelectorAll('*')].filter(el => el.scrollWidth > el.clientWidth)
+------------------------------------------------------------------------------------------
+
+8. Interaktive elementer
+8.1 Find klikbare elementer
+------------------------------------------------------------------------------------------
+[...document.querySelectorAll('button, a')].map(el => ({
+  text: el.innerText,
+  disabled: el.disabled
+}))
+------------------------------------------------------------------------------------------
+
+8.2 Find inputs + deres værdier
+------------------------------------------------------------------------------------------
+[...document.querySelectorAll('input')].map(i => ({
+  name: i.name,
+  type: i.type,
+  value: i.value
+}))
+------------------------------------------------------------------------------------------
+
+9. Event listeners (UI adfærd)
+9.1 Tjek events på element
+------------------------------------------------------------------------------------------
+getEventListeners(document.querySelector('button'))
+------------------------------------------------------------------------------------------
+
+10. UI consistency test (hurtig sanity check)
+10.1 Samlet UI status
+------------------------------------------------------------------------------------------
+({
+  buttons: document.querySelectorAll('button').length,
+  inputs: document.querySelectorAll('input').length,
+  images: document.querySelectorAll('img').length,
+  visibleText: document.body.innerText.length
+})
+------------------------------------------------------------------------------------------
+
+  
