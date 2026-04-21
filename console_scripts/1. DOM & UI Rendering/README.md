@@ -4,7 +4,7 @@ Denne sektion omhandler analyse af webapplikationens DOM (Document Object Model)
 ## Formål med metoden ##
 Den script-baserede tilgang er valgt af følgende årsager:
 
-## Reproducerbarhed ##
+# Reproducerbarhed
 Scripts kan genbruges på tværs af sider og projekter, hvilket gør analyser konsistente og mindre afhængige af manuelle steps.
 ## Hastighed og effektivitet
 Store mængder DOM-data kan analyseres øjeblikkeligt uden manuel navigation i DevTools.
