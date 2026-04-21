@@ -1,15 +1,17 @@
 ###########################################################################################################################################################################################################
-1. Overblik over hele DOM (struktur)
+########################## 1. Overblik over hele DOM (struktur) ###########################################################################################################################################
 ###########################################################################################################################################################################################################
+Denne sektion omhandler metoder til at opnå et overblik over DOM-strukturen i en webapplikation med fokus på både visuel inspektion og programmatisk analyse. Formålet er at forstå, hvordan dokumentet er opbygget, hvordan elementer er organiseret hierarkisk, samt hvordan denne struktur påvirker rendering og performance. Ved at anvende en kombination af direkte DOM-udtræk, visning i DevTools og eksport til eksterne værktøjer opnås en fleksibel tilgang, hvor både hurtig fejlfinding og dybere analyse er mulig. Metoderne spænder fra simple snapshots af hele HTML-strukturen til mere avancerede repræsentationer som JSON-træer, hvilket gør det muligt at arbejde med DOM’en på forskellige abstraktionsniveauer. Dette understøtter en systematisk QA-tilgang, hvor man kan verificere tilstedeværelsen af elementer, analysere dynamisk genereret indhold og identificere potentielle problemer relateret til struktur, kompleksitet og rendering. Derudover giver målinger som antal DOM-noder og DOM-dybde en indikation af applikationens kompleksitet og potentielle performanceudfordringer. Disse metrics bør ikke vurderes isoleret, men i sammenhæng med applikationens adfærd og brugsmønstre. Samlet set fungerer denne sektion som et fundament for videre analyse, hvor DOM’en betragtes som en central kilde til indsigt i både funktionalitet og performance.
 
----- 1.1 Dump hele HTML ----
+
+---- 1.1 Dump hele HTML -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Returnerer hele dokumentets HTML som én samlet string, herunder `<html>`, `<head>` og `<body>`. Dette kan anvendes til at tage et snapshot af DOM’en med henblik på sammenligning før og efter brugerhandlinger, eksempelvis ved debugging af rendering issues, hvor brugerinterfacet ikke matcher den forventede tilstand. Metoden gør det også muligt at verificere, om specifikke elementer eksisterer i DOM’en, selv hvis de ikke er synlige i UI’et, samt at analysere dynamisk genereret HTML. Det er dog vigtigt at bemærke, at outputtet ikke er formatteret og derfor kan være vanskeligt at læse direkte i console. Derudover vises der ikke information om live interaktioner såsom event listeners eller computed styles, og outputtet repræsenterer udelukkende den strukturelle opbygning af dokumentet og ikke selve rendering-processen.
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 document.documentElement.outerHTML
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
----- 1.2 Hele Elements i ny fane ----
+---- 1.2 Hele Elements i ny fane --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Åbner en ny browserfane og indsætter hele dokumentets HTML som tekst i et `<pre>`-element, hvilket bevarer linjeskift og gør strukturen mere læsbar end rå console-output. Metoden anvendes primært til hurtig visuel inspektion af DOM-strukturen uden for DevTools, samt til at kopiere og sammenligne HTML-snapshots i separate faner. Den kan også bruges i dokumentationssammenhæng, hvor en overskuelig tekstrepræsentation af DOM’en ønskes. Det er dog vigtigt at bemærke, at outputtet ikke indeholder syntax highlighting eller interaktiv funktionalitet, og at det udelukkende er en statisk tekstvisning af HTML’en. Derudover kan metoden blive ressourcekrævende ved store DOM-træer, og den afspejler ikke runtime-information såsom styles, events eller dynamiske ændringer efter rendering.
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 window.open().document.write(
@@ -18,19 +20,19 @@ window.open().document.write(
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
----- 1.3 Copy/Paste Hele HTML ----
+---- 1.3 Copy/Paste Hele HTML -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Kopierer hele dokumentets HTML til systemets clipboard som én samlet string, hvilket gør det muligt at overføre DOM-strukturen direkte til eksterne værktøjer. Metoden anvendes typisk til eksport af HTML med henblik på videre analyse i eksempelvis VS Code, hvor koden kan formatteres og gennemgås mere struktureret, eller til sammenligning af DOM-snapshots mellem forskellige tilstande. Den er desuden velegnet til dokumentation i rapporter, hvor en præcis gengivelse af DOM’en ønskes. Det skal dog bemærkes, at outputtet er uformatteret og ikke indeholder information om runtime-forhold såsom event listeners, computed styles eller dynamiske ændringer, og at analysen derfor ofte kræver efterfølgende behandling i et eksternt værktøj.
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 copy(document.documentElement.outerHTML)
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
----- 1.4 Elements ----
+---- 1.4 Elements -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Åbner dokumentets DOM direkte i DevTools Elements-panelet, hvor strukturen vises i en formatteret og interaktiv trævisning. Metoden anvendes til live analyse af DOM’en, hvor det er muligt at inspicere elementer, gennemgå hierarkiet, samt analysere tilhørende CSS, layout og attributter. Den er særligt velegnet til debugging af rendering issues og til at forstå, hvordan brugerinterfacet opbygges og ændrer sig dynamisk under runtime. I modsætning til rå HTML-output giver denne tilgang indsigt i browserens faktiske fortolkning af DOM’en, herunder styles og beregnede værdier. Det skal dog bemærkes, at metoden er afhængig af DevTools’ grafiske interface og derfor ikke egner sig til eksport eller automatiseret analyse i samme grad som script-baserede løsninger.
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------inspect(document.documentElement)
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
----- 1.5. Download DOM som fil ----
+---- 1.5. Download DOM som fil ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 DOM-strukturen kan eksporteres direkte fra browseren som en HTML-fil ved hjælp af script-baserede metoder. Dette muliggør offline analyse, dokumentation og sammenligning af forskellige systemtilstande. Metoden anvendes særligt i QA-sammenhæng til snapshot- og regressionstest, hvor ændringer i DOM’en kan identificeres og analyseres systematisk.
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 const blob = new Blob(
@@ -45,7 +47,7 @@ a.click();
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
----- 1.6 JSON log struktur ----
+---- 1.6 JSON log struktur --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Konverterer DOM-strukturen til en hierarkisk JSON-repræsentation ved rekursivt at gennemløbe alle elementer fra det angivne udgangspunkt (her document.body). Hvert element beskrives som et objekt med en tag-værdi (elementets tag-navn) samt en children-liste, der indeholder tilsvarende objekter for alle underliggende elementer. Resultatet logges i console som en træstruktur, der afspejler DOM’ens opbygning i en maskinlæsbar form. Metoden anvendes til strukturel analyse af DOM’en, hvor fokus er på relationerne mellem elementer frem for deres visuelle repræsentation. Den er særligt velegnet i QA-sammenhæng til at få et hurtigt overblik over dokumentets hierarki, identificere nesting-problemer, samt som grundlag for videre automatiseret behandling, eksempelvis søgning, filtrering eller sammenligning mellem forskellige DOM-tilstande. I modsætning til rå HTML giver JSON-strukturen en mere ensartet og programmatisk tilgang til analyse. Det skal dog bemærkes, at outputtet er begrænset til selve strukturen og ikke indeholder information om attributter, tekstindhold, styles eller event listeners. Metoden afspejler derfor ikke den fulde rendering-tilstand, men fungerer som en letvægtsrepræsentation af DOM’ens hierarki, primært egnet til teknisk analyse og videre behandling i scripts.
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -59,7 +61,7 @@ function getDOMTree(el) {
 console.log(getDOMTree(document.body));
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
----- 1.7 Antal DOM nodes (performance indikator) ----
+---- 1.7 Antal DOM nodes (performance indikator) ----------------------------------------------------------------------------------------------------------------------------------------------------------
 Returnerer det samlede antal DOM-elementer på siden ved at selektere alle noder (`*`). Dette anvendes som en hurtig indikator for DOM-kompleksitet og kan give en tidlig vurdering af potentielle performanceproblemer relateret til rendering, reflow og memory-forbrug. Metoden er velegnet til at sammenligne DOM-størrelsen før og efter dynamiske ændringer, såsom tilføjelse af komponenter eller opdatering af UI. Som tommelfingerregel vil et DOM-træ med under ca. 1.000 noder sjældent give problemer, mens områder mellem 1.000 og 3.000 noder kan begynde at påvirke performance afhængigt af struktur og kompleksitet. Over 3.000 noder anses generelt som en høj belastning, hvor risikoen for langsommere rendering, øget reflow/repaint og dårligere interaktiv respons stiger markant. Ved endnu større DOM-strukturer kan der opstå synlige performanceproblemer, særligt på mindre kraftige enheder. Det er dog vigtigt at bemærke, at antallet af noder alene ikke er afgørende; dybden af DOM-træet, hyppigheden af opdateringer og brugen af CSS og JavaScript spiller også en væsentlig rolle. Metoden bør derfor anvendes som en indledende indikator og kombineres med yderligere analyseværktøjer ved identificering af performanceproblemer.
 
 Tommelfingerregler
@@ -69,9 +71,25 @@ Antal nodes	Vurdering
 3000 – 5000	Høj
 5000+	Potentielt problem
 10.000+	Kritisk
-------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 document.querySelectorAll('*').length
-------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+---- 1.8 DOM dybde ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+DOM-dybde refererer til antallet af niveauer i dokumentets hierarkiske struktur, målt fra roden af DOM-træet (`<html>` eller et valgt udgangspunkt som `document.body`) ned til de dybest placerede elementer. En høj DOM-dybde betyder, at elementer er indlejret i mange lag af parent-child relationer, hvilket kan øge kompleksiteten i browserens rendering-proces. Dette har betydning for performance, da ændringer i DOM’en kan medføre gentagne beregninger af layout (reflow) og visuel opdatering (repaint), især når ændringer sker højt i hierarkiet og påvirker mange underliggende elementer. I praksis kan en dyb DOM-struktur gøre det dyrere for browseren at beregne styles og layout, da flere niveauer skal traverseres ved hver opdatering. Dette kan resultere i langsommere interaktioner, særligt på mindre kraftige enheder eller ved hyppige dynamiske ændringer. Som tommelfingerregel anses en DOM-dybde på under 15 niveauer som uproblematisk, mens dybder mellem 15 og 30 kan begynde at påvirke performance afhængigt af kontekst. Ved dybder over 30 niveauer øges risikoen for ineffektiv rendering markant, og det bør overvejes at flade strukturen ud. Det er dog vigtigt at understrege, at DOM-dybde ikke bør vurderes isoleret, men i samspil med det samlede antal noder, hyppigheden af DOM-manipulationer samt kompleksiteten af CSS-regler. En moderat dyb DOM kan være uproblematisk i statiske scenarier, mens selv mindre dybder kan give udfordringer i dynamiske applikationer med mange opdateringer. DOM-dybde fungerer derfor som en vigtig indikator i en samlet performanceanalyse af webapplikationer.
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+function getDepth(el) {
+  let max = 0;
+  function walk(node, depth) {
+    if (depth > max) max = depth;
+    [...node.children].forEach(child => walk(child, depth + 1));
+  }
+  walk(el, 0);
+  return max;
+}
+
+getDepth(document.body);
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 >
 >
