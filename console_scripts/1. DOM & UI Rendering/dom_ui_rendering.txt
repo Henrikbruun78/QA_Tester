@@ -48,7 +48,8 @@ copy(document.documentElement.outerHTML)
 elementer, gennemgå hierarkiet, samt analysere tilhørende CSS, layout og attributter. Den er særligt velegnet til debugging af rendering issues og til at forstå, hvordan brugerinterfacet opbygges og
 ændrer sig dynamisk under runtime. I modsætning til rå HTML-output giver denne tilgang indsigt i browserens faktiske fortolkning af DOM’en, herunder styles og beregnede værdier. Det skal dog bemærkes,
 at metoden er afhængig af DevTools’ grafiske interface og derfor ikke egner sig til eksport eller automatiseret analyse i samme grad som script-baserede løsninger.
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------inspect(document.documentElement)
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+inspect(document.documentElement)
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ---- 1.5. Download DOM som fil ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
