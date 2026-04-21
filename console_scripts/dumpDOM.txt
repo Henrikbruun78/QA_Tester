@@ -1,2 +1,11 @@
 #### Dump hele DOM ####
 document.documentElement.outerHTML
+
+#### Detaljeret DOM ####
+[...document.querySelectorAll('input')].map(i => ({
+  name: i.name,
+  type: i.type,
+  value: i.value
+}))
+
+
