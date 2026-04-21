@@ -1,6 +1,5 @@
-##########################################################################
+
 **Overblik over hele DOM (struktur)**
-##########################################################################
 
 Beskrivelse
 Returnerer hele dokumentets HTML som én samlet string (inkl. <html>, <head> og <body>).
