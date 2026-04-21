@@ -1,0 +1,12 @@
+#### Hook fetches og log alle API ####
+
+const originalFetch = window.fetch;
+
+window.fetch = async (...args) => {
+  console.log("REQUEST:", args);
+  const response = await originalFetch(...args);
+  const clone = response.clone();
+  clone.json().then(data => console.log("RESPONSE:", data)).catch(() => {});
+  return response;
+};
+
