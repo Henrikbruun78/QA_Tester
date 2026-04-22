@@ -78,7 +78,6 @@ sammenhæng til at få et hurtigt overblik over dokumentets hierarki, identifice
 sammenligning mellem forskellige DOM-tilstande. I modsætning til rå HTML giver JSON-strukturen en mere ensartet og programmatisk tilgang til analyse. Det skal dog bemærkes, at outputtet er begrænset til
 selve strukturen og ikke indeholder information om attributter, tekstindhold, styles eller event listeners. Metoden afspejler derfor ikke den fulde rendering-tilstand, men fungerer som en
 letvægtsrepræsentation af DOM’ens hierarki, primært egnet til teknisk analyse og videre behandling i scripts.
-
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function getDOMTree(el) {
   return {
@@ -173,8 +172,6 @@ Tag ---------------------- document.getElementsByTagName('div')
 Alle Match --------------- document.querySelectorAll('.class')
 Attribut ----------------- document.querySelector('[data-name="test"]')
 Alle med atributer ------- document.querySelectorAll('[href]')
-
-
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 [
   document.querySelector('#login'),
@@ -196,7 +193,6 @@ Find children ------------- el.children
 Find first child ---------- el.firstElementChild
 Find næste sibling -------- el.nextElementSibling
 Find inde i element ------- el.querySelector('span')
-
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 const el = document.querySelector('button');
 el.parentElement
@@ -221,7 +217,6 @@ DOM’en. Dette er særligt relevant i moderne webapplikationer, hvor elementer 
 identificere UI-fejl, hvor elementer er til stede i DOM’en, men ikke synlige eller interaktive. Det skal dog bemærkes, at metoden ikke nødvendigvis dækker alle tilfælde af synlighed. Eksempelvis kan
 elementer være skjult via `opacity: 0`, positioneret uden for viewport eller overlappet af andre elementer. Funktionen bør derfor betragtes som en praktisk, men ikke fuldstændig, indikator for visuel
 synlighed og kan med fordel suppleres med yderligere checks afhængigt af testbehov.
-
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function isVisible(el) {
   if (!el) return false;
@@ -242,14 +237,12 @@ elementer kan blive vist eller skjult afhængigt af brugerinteraktioner eller ap
 `offsetParent !== null` kun er en indikator for, om elementet er en del af det visuelle layout, og ikke nødvendigvis om det er fuldt synligt eller interaktivt. Elementer kan stadig være skjult via CSS
 egenskaber som `opacity: 0`, være placeret uden for viewport eller være dækket af andre elementer. Derudover begrænser scriptet sig til `<button>`-tags, hvilket kan være utilstrækkeligt i moderne
 webapplikationer, hvor klikbare elementer ofte implementeres som `<a>` eller `<div>` med interaktiv adfærd.
-
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 [...document.querySelectorAll('button')].map(btn => ({
   text: btn.innerText,
   visible: btn.offsetParent !== null
 }))
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 
 ---- 3.3 Se alle knapper ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Scriptet gennemgår alle `<button>`-elementer i DOM’en og markerer de elementer, der vurderes som synlige i layoutet, ved at tilføje en visuel ramme (`border`) direkte via inline styles. Synligheden afgøres
@@ -259,7 +252,6 @@ nyttig ved analyse af komplekse eller dynamiske sider, hvor det kan være vanske
 uventede eller skjulte knapper, som stadig er en del af layoutet. Det skal dog bemærkes, at metoden kun markerer `<button>`-elementer og derfor ikke fanger andre typer af klikbare komponenter, såsom `<a>`
 eller elementer med `role="button"`, som ofte anvendes i moderne webapplikationer. Samtidig er ændringen midlertidig og påvirker kun den aktuelle browser-session, hvilket gør den velegnet til debugging,
 men ikke til permanent dokumentation eller automatiseret test uden yderligere tilpasning.
-
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 document.querySelectorAll('button').forEach(btn => {
   if (btn.offsetParent !== null) {
@@ -277,7 +269,6 @@ elementer ved at søge i `href`-attributten, hvilket kan være relevant, når de
 korrekt implementeret og tilgængelige, samt til at identificere alle klikbare elementer i applikationen. Det er dog vigtigt at bemærke, at valg af selector har stor betydning for robustheden af analysen.
 Data-attributter er generelt mere stabile end classes, mens tekst- eller href-baserede søgninger kan være mere sårbare over for ændringer. Kombinationen af flere metoder giver derfor den mest pålidelige
 tilgang til identifikation og analyse af interaktive elementer i moderne webapplikationer.
-
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Find login link ------------- document.querySelector('[data-testid="header-login-link"]')
 Marker alle klikbare -------- 
@@ -287,18 +278,28 @@ document.querySelectorAll('button, a, [role="button"]').forEach(el => {
 Find login via href -------- document.querySelector('a[href*="login"]')
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-##########################################################################################################################################################################################################  
+########################################################################################################################################################################################################## 
 ############ 4. Tjek UI tekst (content validation) #######################################################################################################################################################
 ##########################################################################################################################################################################################################
 
 ---- 4.1. Hent al synlig tekst ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+Returnerer al synlig tekst i dokumentets `<body>` som én samlet string baseret på browserens aktuelle rendering. I modsætning til `textContent` tager `innerText` højde for CSS og layout, hvilket betyder, at
+tekst fra skjulte elementer (fx `display: none`) ikke inkluderes, mens linjeskift og visuel struktur bevares. Metoden anvendes i QA-sammenhæng til hurtigt at validere, hvilket tekstindhold en bruger reelt
+præsenteres for. Den er særligt nyttig ved kontrol af UI-tekster som labels, knapper, fejlbeskeder og overskrifter, samt til at verificere ændringer i tekst efter brugerinteraktioner som login, navigation eller
+formularindsendelse. Derudover kan den bruges til at søge efter specifikke ord eller sætninger i hele UI’et og til at opdage manglende eller uventet tekst. Det skal dog bemærkes, at metoden returnerer al synlig
+tekst uden struktur, hvilket kan gøre det vanskeligt at relatere tekst til specifikke elementer. Samtidig påvirkes resultatet af styling og layout, hvilket kan give variationer afhængigt af rendering. Metoden
+egner sig derfor bedst til overordnet tekstvalidering og bør kombineres med mere målrettede selectors ved behov for præcis analyse.
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 document.body.innerText
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ---- 4.2 Find bestemte tekster ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+Kontrollerer om en specifik tekststreng findes i den synlige del af brugerinterfacet ved at søge i hele dokumentets tekstindhold via innerText. Metoden returnerer en boolesk værdi (true eller false), afhængigt
+af om teksten forekommer i det aktuelt renderede UI. Da innerText kun indeholder synlig tekst, afspejler resultatet det, som brugeren reelt kan se på siden.
+Metoden anvendes i QA-sammenhæng til hurtig verifikation af, om bestemte tekster er til stede, eksempelvis “Log ind”, fejlbeskeder eller statusmeddelelser efter en brugerhandling. Den er særligt nyttig til
+simple checks i forbindelse med dynamiske ændringer i UI’et, hvor man ønsker at bekræfte, at en given tekst vises eller forsvinder korrekt. Det skal dog bemærkes, at metoden ikke angiver, hvor i DOM’en teksten
+findes, og heller ikke hvilken komponent den tilhører. Derudover er søgningen case-sensitiv og kan give upræcise resultater, hvis teksten optræder flere steder eller som del af en større streng. Metoden egner
+sig derfor bedst til overordnet tekstvalidering og bør suppleres med mere specifikke selectors ved behov for præcis lokalisering.
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 document.body.innerText.includes("Log ind")
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -307,24 +308,43 @@ document.body.innerText.includes("Log ind")
 ############ 5. Billeder og assets #######################################################################################################################################################################
 ##########################################################################################################################################################################################################  
 
-5.1 Tjek alle billeder
-------------------------------------------------------------------------------------------
+---- 5.1 Tjek alle billeder -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Scriptet gennemgår alle billeder i dokumentet ved hjælp af `document.images` og returnerer en liste med oplysninger om hvert billede, herunder dets kilde (`src`) og om billedet er fuldt indlæst (`complete`).
+Dette giver et hurtigt overblik over, hvilke billeder der anvendes på siden, samt deres load-status. Metoden anvendes i QA-sammenhæng til at verificere, at alle billeder indlæses korrekt og ikke fejler under
+rendering. Den er særligt nyttig til at identificere manglende eller fejlbehæftede billeder, eksempelvis ved forkerte URLs, netværksproblemer eller assets, der ikke er tilgængelige. Derudover kan den anvendes
+til at validere, at dynamisk indlæste billeder faktisk bliver hentet og vist som forventet. Det skal dog bemærkes, at `img.complete` kun indikerer, om browseren har afsluttet indlæsningen af billedet, og ikke
+nødvendigvis om billedet er korrekt gengivet. Et billede kan derfor være markeret som “loaded”, selvom det eksempelvis returnerer en fejl eller er tomt. Metoden bør derfor anvendes som en indledende kontrol og
+suppleres med yderligere validering ved behov.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 [...document.images].map(img => ({
   src: img.src,
   loaded: img.complete
 }))
-------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-5.2 Find broken images
-------------------------------------------------------------------------------------------
+---- 5.2 Find broken images ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Gennemgår alle billeder i dokumentet og filtrerer de elementer, hvor `complete` er `false`, hvilket indikerer, at billedet ikke er fuldt indlæst. Resultatet er en liste over potentielt fejlbehæftede eller ikke
+indlæste billeder baseret på browserens aktuelle load-status. Metoden anvendes i QA-sammenhæng til hurtigt at identificere billeder, der ikke er blevet hentet korrekt, eksempelvis på grund af netværksfejl,
+forkerte URLs eller problemer med asset-levering. Den er særligt nyttig ved gennemgang af sider med mange billeder eller dynamisk indhold, hvor man ønsker en hurtig indikation af load-problemer uden manuel 
+inspektion. Det skal dog bemærkes, at `complete === false` kun dækker tilfælde, hvor indlæsningen ikke er afsluttet. Et billede kan stadig være markeret som `complete === true`, selvom det reelt er “broken” (fx 
+ved HTTP-fejl eller tom respons). Metoden bør derfor suppleres med yderligere checks, såsom validering af `naturalWidth` eller netværksanalyse i DevTools, for en mere præcis vurdering.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 [...document.images].filter(img => !img.complete)
-------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-6. Dynamiske ændringer (live overvågning)
+##########################################################################################################################################################################################################
+############ 6. Dynamiske ændringer (live overvågning) ###################################################################################################################################################
+##########################################################################################################################################################################################################
 
-6.1 Observer DOM ændringer
-
-------------------------------------------------------------------------------------------
+---- 6.1 Observer DOM ændringer --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Opretter en `MutationObserver`, som overvåger ændringer i DOM’en ved at lytte på `document.body` og alle underliggende elementer (`subtree: true`). Når der sker ændringer, eksempelvis tilføjelse eller fjernelse
+af noder (`childList: true`), logges disse som en liste af mutationer i console. Dette giver direkte indsigt i, hvilke dele af DOM’en der ændres, og hvornår det sker. Metoden anvendes i QA-sammenhæng til at
+analysere dynamiske opdateringer i brugerinterfacet, såsom ændringer ved login, opdatering af kurv eller generel rendering af komponenter. Den er særligt nyttig til at forstå, hvordan applikationen manipulerer
+DOM’en under runtime, og til at identificere uventede eller manglende opdateringer i UI’et. Dette gør det muligt at validere, om brugerhandlinger fører til de forventede ændringer i DOM-strukturen.
+Det skal dog bemærkes, at observeren kan generere en stor mængde data, især på komplekse sider med hyppige opdateringer, hvilket kan gøre det nødvendigt at filtrere eller begrænse outputtet. Derudover overvåger
+metoden kun strukturelle ændringer og ikke direkte ændringer i styles eller properties, medmindre disse påvirker DOM’en. Funktionen bør derfor anvendes målrettet og eventuelt stoppes igen med
+`observer.disconnect()` for at undgå unødvendig belastning.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 const observer = new MutationObserver(mutations => {
   console.log(mutations);
 });
@@ -333,11 +353,115 @@ observer.observe(document.body, {
   childList: true,
   subtree: true
 });
-------------------------------------------------------------------------------------------
-Bruges til:
-login ændringer
-kurv opdatering
-dynamisk rendering
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Den stoppes ved denne kommando
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+observer.disconnect();
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+---- 6.2 Smart MutationObserver --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Smart MutationObserver er en videreudvikling af den grundlæggende `MutationObserver`, hvor fokus er på at filtrere og målrette de registrerede DOM-ændringer, så kun relevante hændelser analyseres. I moderne
+webapplikationer, hvor DOM’en ofte opdateres dynamisk og hyppigt, kan en ufiltreret observer generere store mængder støj, hvilket gør det vanskeligt at identificere de ændringer, der faktisk har betydning for
+funktionalitet og brugeroplevelse. Ved at anvende en “smart” observer kan man reducere denne støj og opnå en mere præcis og anvendelig analyse af UI-opdateringer. De forskellige versioner illustrerer, hvordan
+observeren kan tilpasses specifikke behov. Version 1 fokuserer på strukturelle ændringer ved kun at logge tilføjede og fjernede noder, hvilket giver et klart overblik over dynamiske ændringer i DOM’en. Version 2
+udvider dette ved at filtrere på tekstindhold, eksempelvis “Log ind”, og gør det muligt målrettet at overvåge bestemte UI-elementer eller brugerflows. Version 3 begrænser overvågningen til et specifikt område af
+DOM’en, såsom `<header>`, hvilket reducerer belastning og gør analysen mere fokuseret. Version 4 anvendes til at overvåge ændringer i attributter, eksempelvis class-ændringer, som ofte bruges til at styre
+synlighed og UI-tilstand. Version 5 tilføjer en visuel dimension ved at markere nytilføjede elementer direkte i brugerinterfacet, hvilket gør det muligt hurtigt at identificere dynamiske ændringer uden at
+gennemgå console-output. Metoden anvendes i QA-sammenhæng til at analysere og validere dynamiske UI-opdateringer, såsom ændringer ved login, opdatering af kurv eller rendering af komponenter. Den giver indsigt
+i, hvordan applikationen manipulerer DOM’en under runtime, og gør det muligt at identificere både forventede og uventede ændringer. Det er dog vigtigt at anvende filtrering og målretning, da en ukontrolleret
+observer kan påvirke performance og gøre analysen uoverskuelig.
+
+
+Version 1: Kun relevante ændringer
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+const observer = new MutationObserver(mutations => {
+  mutations.forEach(m => {
+
+    // Kun hvis der er tilføjet elementer
+    if (m.addedNodes.length > 0) {
+      console.log("➕ Added:", [...m.addedNodes]);
+    }
+
+    // Kun hvis der er fjernet elementer
+    if (m.removedNodes.length > 0) {
+      console.log("➖ Removed:", [...m.removedNodes]);
+    }
+
+  });
+});
+
+observer.observe(document.body, {
+  childList: true,
+  subtree: true
+});
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Version 2: Filtreret på tekst
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+const observer = new MutationObserver(mutations => {
+  mutations.forEach(m => {
+    [...m.addedNodes].forEach(node => {
+      if (node.innerText && node.innerText.includes("Log ind")) {
+        console.log("🔍 Login element added:", node);
+      }
+    });
+  });
+});
+
+observer.observe(document.body, {
+  childList: true,
+  subtree: true
+});
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Version 3: Track specifikt område
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+const target = document.querySelector('header');
+
+const observer = new MutationObserver(mutations => {
+  console.log("Header changed:", mutations);
+});
+
+observer.observe(target, {
+  childList: true,
+  subtree: true
+});
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Version  4: Track Attributes
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+const observer = new MutationObserver(mutations => {
+  mutations.forEach(m => {
+    if (m.type === 'attributes') {
+      console.log(`⚙️ Attribute changed: ${m.attributeName}`, m.target);
+    }
+  });
+});
+
+observer.observe(document.body, {
+  attributes: true,
+  subtree: true
+});
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Version 5: Highlight nye elementer
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+const observer = new MutationObserver(mutations => {
+  mutations.forEach(m => {
+    [...m.addedNodes].forEach(node => {
+      if (node.nodeType === 1) {
+        node.style.border = '2px solid red';
+      }
+    });
+  });
+});
+
+observer.observe(document.body, {
+  childList: true,
+  subtree: true
+});
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 7. CSS & layout issues
 7.1 Find elementer uden størrelse
