@@ -1,0 +1,81 @@
+###########################################################################################################################################################################################################
+########################## 1. Requests ####################################################################################################################################################################
+###########################################################################################################################################################################################################
+
+
+
+
+---- 1.1 Send GET requests (hent data) --------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Returnerer data fra serveren ved at sende en HTTP GET request til det angivne endpoint. Metoden anvender fetch, som er browserens indbyggede API til netværkskommunikation, og konverterer responsen til 
+JSON-format for videre analyse. Metoden anvendes i QA-sammenhæng til at verificere, at backend endpoints returnerer de forventede data, samt til at analysere datastrukturen uafhængigt af brugerinterfacet. 
+Den er særligt nyttig til at forstå, hvilke data der ligger bag UI-komponenter, og til at identificere fejl i datalevering, eksempelvis manglende felter eller forkert struktur. Det skal dog bemærkes, 
+at metoden ikke viser statuskoder eller headers direkte, medmindre disse logges eksplicit. Derudover afhænger resultatet af korrekt parsing via .json(), hvilket kan fejle, hvis responsen ikke er i 
+JSON-format.
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+fetch('/api/products')
+  .then(res => res.json())
+  .then(data => console.log(data))
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+---- 1.2 Send POST request (login / data send) ------------------------------------------------------------------------------------------------------------------------------------------------------------
+Sender data til serveren via en HTTP POST request med en JSON payload. Requesten indeholder både headers og body, hvor Content-Type specificerer dataformatet, og body indeholder de data, der skal 
+behandles af serveren. Metoden anvendes i QA-sammenhæng til at teste funktionalitet som login, formularindsendelser og dataoprettelse uden at benytte UI’et. Den giver mulighed for direkte at verificere 
+backend-logik, teste forskellige inputscenarier og manipulere requests for at identificere fejl eller manglende validering. Det skal bemærkes, at metoden ikke automatisk håndterer fejlstatuskoder, og at 
+responsen altid forsøges parsed som JSON. Derudover kræver korrekt funktion, at endpointet understøtter POST requests og forventer data i det angivne format.
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+fetch('/api/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    email: 'customer@example.com',
+    password: 'Test1234'
+  })
+})
+.then(res => res.json())
+.then(console.log)
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+---- 1.3 Send ugyldig / manipuleret request (QA test) -----------------------------------------------------------------------------------------------------------------------------------------------------
+Sender en bevidst manipuleret request med ugyldige datatyper for at teste systemets robusthed og validering. I stedet for forventede string-værdier sendes numeriske og boolske værdier, hvilket udfordrer 
+backendens inputhåndtering. Metoden anvendes i QA-sammenhæng til at identificere manglende eller utilstrækkelig validering, samt til at verificere, hvordan systemet håndterer uventet input. 
+Den er særligt relevant i forbindelse med sikkerhedstest og edge cases, hvor man ønsker at afdække potentielle fejl eller sårbarheder. Det skal bemærkes, at selvom frontend typisk forhindrer sådanne 
+inputs, kan de stadig sendes direkte via scripts. Derfor er det vigtigt, at backend også håndterer og validerer data korrekt.
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+fetch('/api/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    email: 123,
+    password: true
+  })
+})
+.then(res => res.json())
+.then(console.log)
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+---- 1.4 Log request og response (intercept fetch) --------------------------------------------------------------------------------------------------------------------------------------------------------
+Overskriver browserens fetch-funktion for at logge alle udgående requests og deres tilhørende responses i realtid. Ved at gemme den originale fetch og returnere den efter logging bevares den oprindelige 
+funktionalitet, mens netværksaktiviteten overvåges. Metoden anvendes i QA-sammenhæng til at analysere, hvilke requests der sendes fra applikationen, hvilke data der inkluderes, samt hvordan serveren 
+responderer. Den er særligt nyttig ved debugging af komplekse flows, hvor flere requests sendes automatisk, og hvor det kan være vanskeligt at følge dataflowet via UI’et alene. Det skal bemærkes, 
+at metoden kun påvirker den aktuelle session og kan påvirke performance eller skabe støj i console ved mange requests. Derudover håndteres kun fetch-baserede requests og ikke nødvendigvis andre 
+netværksmetoder som XMLHttpRequest.
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+const originalFetch = window.fetch;
+
+window.fetch = async (...args) => {
+  console.log("REQUEST:", args);
+  const response = await originalFetch(...args);
+  const clone = response.clone();
+  clone.json().then(data => console.log("RESPONSE:", data)).catch(() => {});
+  return response;
+};
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+---- 1.5 Send request med forkert endpoint ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+Sender en request til et endpoint, som ikke eksisterer, med henblik på at teste systemets håndtering af fejl. Responsens statuskode logges direkte uden parsing. Metoden anvendes i QA-sammenhæng til 
+at verificere korrekt håndtering af fejltilstande, eksempelvis om systemet returnerer passende statuskoder som 404 (Not Found). Den er også relevant til at teste, om frontend håndterer fejl korrekt, 
+og om brugeren modtager passende feedback. Det skal bemærkes, at metoden kun giver indsigt i statuskoden og ikke i selve responsens indhold, medmindre dette håndteres yderligere.
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+fetch('/api/unknown')
+  .then(res => console.log(res.status))
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
