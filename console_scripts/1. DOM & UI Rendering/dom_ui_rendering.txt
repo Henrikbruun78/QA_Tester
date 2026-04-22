@@ -136,11 +136,6 @@ function getDepth(el) {
 getDepth(document.body);
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
->
->
->
-
-
 
 ###########################################################################################################################################################################################################
 ############ 2. Tjek om vigtige elementer findes ##########################################################################################################################################################
@@ -159,9 +154,9 @@ console.log({
   inputs: document.querySelectorAll('input').length,
   images: document.querySelectorAll('img').length
 });
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
----- 2.2. Verificer specifikke elementer (tilpas selectors) -----------------------------------------------------------------------------------------------------------------------------------------------
+---- 2.2. Verificer specifikke elementer (tilpas selectors) ----------------------------------------------------------------------------------------------------------------------------------------------
 Returnerer en liste af specifikke DOM-elementer baseret på angivne selectors, hvor hvert element enten repræsenteres som en reference til det fundne DOM-node eller som `null`, hvis elementet ikke
 eksisterer. Metoden anvendes til målrettet verifikation af kritiske UI-komponenter, såsom login-sektion, kurv og checkout, og giver en hurtig måde at afgøre, om centrale funktionelle områder er korrekt
 indlæst i DOM’en. Denne tilgang er særligt anvendelig i QA-sammenhæng til at validere, at forventede elementer er til stede efter bestemte handlinger eller ved initial rendering. Den kan også bruges til
@@ -169,25 +164,54 @@ at identificere fejl i selectors, manglende komponenter eller problemer med dyna
 tilstedeværelsen i DOM’en og ikke tager højde for elementernes synlighed, interaktivitet eller tilstand. Yderligere analyse er derfor nødvendig for at vurdere, om elementerne fungerer korrekt i
 brugerinterfacet. (Returnerer null hvis element mangler)
 
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Disse kan specificeres alt efter hvilken metode man ønsker at lede efter
+
+ID ----------------------- document.querySelector('[id="198864"]')
+Class -------------------- document.getElementsByClassName('myClass')
+Tag ---------------------- document.getElementsByTagName('div')
+1. Match ----------------- document.querySelector('.class')
+Alle Match --------------- document.querySelectorAll('.class')
+Attribut ----------------- document.querySelector('[data-name="test"]')
+Alle med atributer ------- document.querySelectorAll('[href]')
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 [
   document.querySelector('#login'),
   document.querySelector('.cart'),
   document.querySelector('.checkout')
 ]
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
->
->
->
+---- 2.3 Traversing i DOM --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-###########################################################################################################################################################################################################
-3. Synlighed af elementer (meget vigtigt)
-###########################################################################################################################################################################################################
+Traversing i DOM omhandler navigation mellem relaterede elementer i DOM-træet med udgangspunkt i et allerede identificeret element. I stedet for at søge globalt i dokumentet med selectors, giver traversal mulighed for at bevæge sig lokalt i strukturen, eksempelvis fra et element til dets parent, children eller søskendeelementer. Dette er særligt nyttigt i situationer, hvor selectors er komplekse, ustabile eller ikke entydige, som det ofte ses i moderne webapplikationer med dynamisk genereret HTML og mange generiske classes. Metoden anvendes til at analysere relationer mellem elementer, forstå opbygningen af UI-komponenter samt til målrettet debugging, hvor man ønsker at undersøge nærliggende elementer uden at foretage nye søgninger i hele DOM’en. Traversal giver dermed en mere strukturel tilgang til DOM-analyse og er et vigtigt værktøj i både manuel test og teknisk fejlfinding. I DevTools kan traversal yderligere effektiviseres ved brug af `$0`, som refererer til det aktuelt valgte element i Elements-panelet. Dette gør det muligt hurtigt at navigere i DOM-hierarkiet direkte fra et visuelt udgangspunkt.
+
+Find children ------------- el.children
+Find first child ---------- el.firstElementChild
+Find næste sibling -------- el.nextElementSibling
+Find inde i element ------- el.querySelector('span')
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+const el = document.querySelector('button');
+el.parentElement
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Ved brug af devtools, klik element
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+$0.parentElement
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-3.1 Tjek om element er synligt
-------------------------------------------------------------------------------------------
+##########################################################################################################################################################################################################
+############ 3. Synlighed af elementer ###################################################################################################################################################################
+##########################################################################################################################################################################################################
+
+
+---- 3.1 Tjek om element er synligt ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Funktionen anvendes til at vurdere, om et givent DOM-element er synligt i brugerinterfacet ved at kontrollere centrale CSS- og layoutegenskaber. Først verificeres det, om elementet eksisterer, hvorefter der hentes beregnede styles via `getComputedStyle`. Synligheden bestemmes herefter ud fra, om elementet ikke er skjult med `display: none` eller `visibility: hidden`, samt om det har en målbar højde (`offsetHeight > 0`), hvilket indikerer, at det optager plads i layoutet. Metoden anvendes i QA-sammenhæng til at validere, om elementer faktisk er tilgængelige for brugeren og ikke blot eksisterer i DOM’en. Dette er særligt relevant i moderne webapplikationer, hvor elementer ofte oprettes dynamisk og kan være skjult eller vist afhængigt af applikationens tilstand. Funktionen kan dermed bruges til at identificere UI-fejl, hvor elementer er til stede i DOM’en, men ikke synlige eller interaktive. Det skal dog bemærkes, at metoden ikke nødvendigvis dækker alle tilfælde af synlighed. Eksempelvis kan elementer være skjult via `opacity: 0`, positioneret uden for viewport eller overlappet af andre elementer. Funktionen bør derfor betragtes som en praktisk, men ikke fuldstændig, indikator for visuel synlighed og kan med fordel suppleres med yderligere checks afhængigt af testbehov.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 function isVisible(el) {
   if (!el) return false;
   const style = window.getComputedStyle(el);
@@ -197,15 +221,44 @@ function isVisible(el) {
 }
 
 isVisible(document.querySelector('button'))
-------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-3.2 Tjek ALLE knapper for synlighed
-------------------------------------------------------------------------------------------
+---- 3.2 Tjek ALLE knapper for synlighed -----------------------------------------------------------------------------------------------------------------------------------------------------------------
+Scriptet gennemgår alle `<button>`-elementer i DOM’en og returnerer en liste med oplysninger om hver enkelt knap, herunder dens synlige tekst (`innerText`) og en vurdering af, om den er synlig i layoutet baseret på `offsetParent`. Ved at mappe over alle fundne knapper skabes et hurtigt overblik over, hvilke interaktive elementer der er til stede, og om de potentielt er synlige for brugeren. Metoden anvendes typisk i QA-sammenhæng som en hurtig analyse af UI’ets tilstand, hvor man ønsker at identificere skjulte, manglende eller uventede knapper. Den er særligt nyttig ved dynamiske interfaces, hvor elementer kan blive vist eller skjult afhængigt af brugerinteraktioner eller applikationens state, eksempelvis ved login, navigation eller conditional rendering. Det er dog vigtigt at bemærke, at `offsetParent !== null` kun er en indikator for, om elementet er en del af det visuelle layout, og ikke nødvendigvis om det er fuldt synligt eller interaktivt. Elementer kan stadig være skjult via CSS-egenskaber som `opacity: 0`, være placeret uden for viewport eller være dækket af andre elementer. Derudover begrænser scriptet sig til `<button>`-tags, hvilket kan være utilstrækkeligt i moderne webapplikationer, hvor klikbare elementer ofte implementeres som `<a>` eller `<div>` med interaktiv adfærd.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 [...document.querySelectorAll('button')].map(btn => ({
   text: btn.innerText,
   visible: btn.offsetParent !== null
 }))
-------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+---- 3.3 Se alle knapper ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Scriptet gennemgår alle `<button>`-elementer i DOM’en og markerer de elementer, der vurderes som synlige i layoutet, ved at tilføje en visuel ramme (`border`) direkte via inline styles. Synligheden afgøres ved hjælp af `offsetParent !== null`, hvilket indikerer, at elementet ikke er skjult via layout-egenskaber som `display: none`. Resultatet er en visuel fremhævning af alle knapper, som aktuelt indgår i det synlige brugerinterface. Metoden anvendes i QA-sammenhæng til hurtigt at identificere og validere interaktive elementer i UI’et uden at skulle navigere manuelt gennem DOM’en i DevTools. Den er særligt nyttig ved analyse af komplekse eller dynamiske sider, hvor det kan være vanskeligt at få overblik over, hvilke elementer der reelt er tilgængelige for brugeren. Derudover kan den anvendes til at opdage uventede eller skjulte knapper, som stadig er en del af layoutet. Det skal dog bemærkes, at metoden kun markerer `<button>`-elementer og derfor ikke fanger andre typer af klikbare komponenter, såsom `<a>` eller elementer med `role="button"`, som ofte anvendes i moderne webapplikationer. Samtidig er ændringen midlertidig og påvirker kun den aktuelle browser-session, hvilket gør den velegnet til debugging, men ikke til permanent dokumentation eller automatiseret test uden yderligere tilpasning.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+document.querySelectorAll('button').forEach(btn => {
+  if (btn.offsetParent !== null) {
+    btn.style.border = '2px solid red';
+  }
+});
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+---- 3.4 Find forskellige elemeneter ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Find login link ------------- document.querySelector('[data-testid="header-login-link"]')
+Marker alle klikbare -------- 
+document.querySelectorAll('button, a, [role="button"]').forEach(el => {
+  el.style.border = '2px solid red';
+});
+Find login via href -------- document.querySelector('a[href*="login"]')
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
 
 >
 >
