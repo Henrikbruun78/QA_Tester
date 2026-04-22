@@ -3,8 +3,6 @@
 ###########################################################################################################################################################################################################
 
 
-
-
 ---- 1.1 Send GET requests (hent data) --------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Returnerer data fra serveren ved at sende en HTTP GET request til det angivne endpoint. Metoden anvender fetch, som er browserens indbyggede API til netværkskommunikation, og konverterer responsen til 
 JSON-format for videre analyse. Metoden anvendes i QA-sammenhæng til at verificere, at backend endpoints returnerer de forventede data, samt til at analysere datastrukturen uafhængigt af brugerinterfacet. 
@@ -13,9 +11,27 @@ at metoden ikke viser statuskoder eller headers direkte, medmindre disse logges 
 JSON-format.
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 fetch('/api/products')
-  .then(res => res.json())
-  .then(data => console.log(data))
+  .then(res => res.text())
+  .then(console.log)
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Se raw response som text
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+fetch('/api/products')
+  .then(res => res.text())
+  .then(console.log)
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Tjek content-type
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+fetch('/api/products')
+  .then(res => {
+    console.log(res.headers.get('content-type'));
+    return res.text();
+  })
+  .then(console.log);
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 ---- 1.2 Send POST request (login / data send) ------------------------------------------------------------------------------------------------------------------------------------------------------------
 Sender data til serveren via en HTTP POST request med en JSON payload. Requesten indeholder både headers og body, hvor Content-Type specificerer dataformatet, og body indeholder de data, der skal 
